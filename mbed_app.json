@@ -1,0 +1,22 @@
+{
+  "target_overrides": {
+    "*": {
+      "platform.stdio-baud-rate": 9600,
+      "platform.stdio-convert-newlines": true,
+      "platform.minimal-printf-enable-floating-point": true,
+      "target.c_lib": "std",
+      "target.printf_lib": "std",
+      "platform.stdio-buffered-serial": 1,
+      "target.components_add": [
+        "SD"
+      ],
+      "sd.SPI_MOSI": "PA_7",
+      "sd.SPI_MISO": "PA_6",
+      "sd.SPI_CLK": "PA_5",
+      "sd.SPI_CS": "PB_6",
+      "target.features_add": [
+        "STORAGE"
+      ]
+    }
+  }
+}
