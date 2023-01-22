@@ -2,9 +2,13 @@
 
 #include "defines.h"
 
+//if delete this include prog not compiling :(
+#include "models/threadRegistrator.h"
+
 class GcodeLexer;
 class StrParser;
 class SdCardManager;
+//class ThreadRegistrator;
 
 extern GcodeLexer gcodeLexer;
 extern StrParser strParser;
@@ -15,8 +19,8 @@ namespace core
     class Core;
     extern Core core;
 
-    template <typename _ThreadT>
+    template <typename _ThreadRegistrator>
     class CoreTaskManager;
 
-    extern CoreTaskManager<ThreadT> coreTaskManager;
+    extern CoreTaskManager<ThreadRegistrator> coreTaskManager;
 }

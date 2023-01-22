@@ -1,5 +1,7 @@
 #include "global.h"
 
+#include "models/threadRegistrator.h"
+
 #include "core/core.h"
 #include "core/coreTaskManager.h"
 
@@ -14,5 +16,5 @@ SdCardManager sdCard;
 namespace core
 {
     Core core;
-    CoreTaskManager<ThreadT> coreTaskManager;
+    CoreTaskManager<ThreadRegistrator> coreTaskManager;
 }
