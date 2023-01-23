@@ -8,7 +8,7 @@ void ServoJoint::initialize()
 {
     for (auto s : _servo)
     {
-        s->setValue(90);
+        s->setValue(0 + _offset);
     }
 }
 
@@ -31,7 +31,7 @@ void ServoJoint::disable()
 
 double ServoJoint::position() const
 {
-    return _servo[0]->value();
+    return _servo[0]->value() - _offset;
 }
 
 void ServoJoint::setPause(bool p)
@@ -60,6 +60,6 @@ void ServoJoint::move(double pos, double speed)
 {
     for (auto s : _servo)
     {
-        s->setAngleBySpeed(pos, speed);
+        s->setAngleBySpeed(pos + _offset, speed);
     }
 }

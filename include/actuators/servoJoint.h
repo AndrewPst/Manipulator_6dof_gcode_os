@@ -8,6 +8,8 @@ class ServoJoint : public IJoint
 private:
     const std::vector<ServoDriver *> _servo;
 
+    double _offset{90.0};
+
 public:
     ServoJoint(const ServoJoint &) = default;
     explicit ServoJoint(const std::vector<ServoDriver *> &servo);

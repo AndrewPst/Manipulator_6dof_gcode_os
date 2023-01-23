@@ -14,6 +14,8 @@ constexpr static const char* CONFIG_FILE_PATH = "/sd/config.json";
 
 #define __AUTO_SD_INIT 1
 
+#define __PRINT_PARSED_INPUT 0
+
 
 #define __DEBUG_LEVEL_NONE 0
 #define __DEBUG_LEVEL_INFO 1

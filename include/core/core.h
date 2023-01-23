@@ -31,6 +31,12 @@ const static PulseTable_t _table1 = {_pulse1, sizeof(_pulse1) / sizeof(_pulse1[0
 const static uint32_t _pulse2[] = {600, 1510, 2460};
 const static PulseTable_t _table2 = {_pulse2, sizeof(_pulse2) / sizeof(_pulse2[0])};
 
+const static uint32_t _pulse3[] = {620, 1525, 2440};
+const static PulseTable_t _table3 = {_pulse3, sizeof(_pulse3) / sizeof(_pulse3[0])};
+
+const static uint32_t _pulse4[] = {542, 1480, 2380};
+const static PulseTable_t _table4 = {_pulse4, sizeof(_pulse4) / sizeof(_pulse4[0])};
+
 namespace core
 {
     typedef IExecutableCommand *(*ExecutorGenerator)();
@@ -88,11 +94,15 @@ namespace core
             servo->setInverse(true);
             context.enivroment().manipulator.joints.push_back(std::unique_ptr<ServoJoint>(new ServoJoint({servo, &(actRegistrator.template registerActuator<ServoDriver>(D4))})));
 
-            context.enivroment().manipulator.joints.push_back(std::unique_ptr<ServoJoint>(new ServoJoint({&(actRegistrator.template registerActuator<ServoDriver>(D5))})));
+            servo = &(actRegistrator.template registerActuator<ServoDriver>(D5, _table3));
+            servo->setMax(155);
+            context.enivroment().manipulator.joints.push_back(std::unique_ptr<ServoJoint>(new ServoJoint({&(actRegistrator.template registerActuator<ServoDriver>(D5, _table3))})));
 
             context.enivroment().manipulator.joints.push_back(std::unique_ptr<ServoJoint>(new ServoJoint({&(actRegistrator.template registerActuator<ServoDriver>(D6))})));
 
-            context.enivroment().manipulator.joints.push_back(std::unique_ptr<ServoJoint>(new ServoJoint({&(actRegistrator.template registerActuator<ServoDriver>(D7))})));
+            servo = &(actRegistrator.template registerActuator<ServoDriver>(D7, _table4));
+            servo->setInverse(true);
+            context.enivroment().manipulator.joints.push_back(std::unique_ptr<ServoJoint>(new ServoJoint({servo})));
 
             context.enivroment().manipulator.joints.push_back(std::unique_ptr<ServoJoint>(new ServoJoint({&(actRegistrator.template registerActuator<ServoDriver>(D8))})));
 
@@ -122,7 +132,7 @@ namespace core
                 Command_t command{0};
                 uint8_t result = line.parse(buffer.get(), command);
 
-#if __DEBUG_LEVEL >= __DEBUG_LEVEL_VERBOSE
+#if __DEBUG_LEVEL >= __DEBUG_LEVEL_VERBOSE && __PRINT_PARSED_INPUT == 1
                 debug_out << "Executed: " << command.Key << ':' << '\t';
                 for (auto i = command.args.begin(); i != command.args.end(); i++)
                 {

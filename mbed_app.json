@@ -3,7 +3,6 @@
     "*": {
       "platform.stdio-baud-rate": 9600,
       "platform.stdio-convert-newlines": true,
-      "platform.callback-nontrivial": true,
       "platform.minimal-printf-enable-floating-point": true,
       "target.c_lib": "std",
       "target.printf_lib": "std",

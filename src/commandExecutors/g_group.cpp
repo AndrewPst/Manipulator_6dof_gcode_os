@@ -65,7 +65,7 @@ ExecuteState_t g5::started(core::ExecutionEnivroment &m, Command_t &args)
         m.manipulator.joints[index]->move(value, _speed);
     }
     _exTime = max_dif / _speed * 1000.0;
-    DEBUG_VERBOSE("Exe time:  %f", _exTime);
+    //DEBUG_VERBOSE("Exe time:  %f", _exTime);
     return ExecuteState_t::STATE_IN_PROCESS;
 }
 
@@ -104,7 +104,7 @@ ExecuteState_t g6::started(core::ExecutionEnivroment &m, Command_t &args)
         double speed = abs(value - m.manipulator.joints[index]->position()) / (_exTime / 1000.0);
         m.manipulator.joints[index]->move(value, speed);
     }
-    DEBUG_VERBOSE("Exe time: %f", _exTime);
+    //DEBUG_VERBOSE("Exe time: %f", _exTime);
     return ExecuteState_t::STATE_IN_PROCESS;
 }
 
