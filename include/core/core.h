@@ -19,6 +19,8 @@
 #include "models/cmp_str.h"
 #include "models/mutexLocker.h"
 
+#include "actuators/gripper.h"
+
 #include <memory>
 #include <map>
 
@@ -60,6 +62,8 @@ namespace core
         mutable MutexT _contextMapMut;
 
         const std::map<const char *, core::ExecutorGenerator, cmp_str> _avaiableExecutors{
+            std::make_pair(::executableCommands::g0::key(), ::executableCommands::g0::generate),
+            std::make_pair(::executableCommands::g1::key(), ::executableCommands::g1::generate),
             std::make_pair(::executableCommands::g5::key(), ::executableCommands::g5::generate),
             std::make_pair(::executableCommands::g4::key(), ::executableCommands::g4::generate),
             std::make_pair(::executableCommands::g6::key(), ::executableCommands::g6::generate),
@@ -96,7 +100,7 @@ namespace core
 
             servo = &(actRegistrator.template registerActuator<ServoDriver>(D5, _table3));
             servo->setMax(155);
-            context.enivroment().manipulator.joints.push_back(std::unique_ptr<ServoJoint>(new ServoJoint({&(actRegistrator.template registerActuator<ServoDriver>(D5, _table3))})));
+            context.enivroment().manipulator.joints.push_back(std::unique_ptr<ServoJoint>(new ServoJoint({servo})));
 
             context.enivroment().manipulator.joints.push_back(std::unique_ptr<ServoJoint>(new ServoJoint({&(actRegistrator.template registerActuator<ServoDriver>(D6))})));
 
@@ -105,6 +109,9 @@ namespace core
             context.enivroment().manipulator.joints.push_back(std::unique_ptr<ServoJoint>(new ServoJoint({servo})));
 
             context.enivroment().manipulator.joints.push_back(std::unique_ptr<ServoJoint>(new ServoJoint({&(actRegistrator.template registerActuator<ServoDriver>(D8))})));
+
+            servo = &(actRegistrator.template registerActuator<ServoDriver>(PC_8));
+            context.enivroment().manipulator.effector = std::unique_ptr<ServoGripper>(new ServoGripper(*servo));
 
             return 0;
         }

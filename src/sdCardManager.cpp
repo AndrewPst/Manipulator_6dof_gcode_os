@@ -20,6 +20,11 @@ int32_t SdCardManager::init()
     return r;
 }
 
+int32_t SdCardManager::format()
+{
+    return FATFileSystem::format(_sd);
+}
+
 int32_t SdCardManager::deinit()
 {
     return _sd->deinit();

@@ -17,6 +17,8 @@ namespace core
     {
         TASK_INPUT_UART = 0,
         TASK_INPUT_FILE = 1,
+        TASK_INPUT_BUTTONS = 2,
+        TASK_INPUT_DISPLAY = 3
     };
 
     template <typename _ThreadRegistrator>

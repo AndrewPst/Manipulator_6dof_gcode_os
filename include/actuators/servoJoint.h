@@ -18,9 +18,12 @@ public:
 
     void enable() override;
     void disable() override;
+    void stop() override;
 
-    void move(double pos, double speed) override;
+    double move(double pos, double speed) override;
     double position() const override;
+
+    bool posAchievable(double) override;
 
     void setPause(bool p) override;
     JointState_t state() override;

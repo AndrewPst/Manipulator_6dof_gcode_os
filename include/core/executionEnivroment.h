@@ -1,6 +1,7 @@
 #pragma once
 
 #include "models/manipulator.h"
+#include "models/position.h"
 #include <map>
 
 namespace core

@@ -29,9 +29,28 @@ void ServoJoint::disable()
     }
 }
 
+void ServoJoint::stop()
+{
+    for(auto s : _servo)
+    {
+        s->stop();
+    }
+}
+
 double ServoJoint::position() const
 {
     return _servo[0]->value() - _offset;
+}
+
+bool ServoJoint::posAchievable(double pos)
+{
+    pos += _offset;
+    for (auto s : _servo)
+    {
+        if (pos < s->min() || pos > s->max())
+            return false;
+    }
+    return true;
 }
 
 void ServoJoint::setPause(bool p)
@@ -56,10 +75,13 @@ JointState_t ServoJoint::state()
         return {JointState::JSTATE_IN_PROCESS};
 }
 
-void ServoJoint::move(double pos, double speed)
+double ServoJoint::move(double pos, double speed)
 {
+    pos += _offset;
+    pos = pos > _servo[0]->max() ? _servo[0]->max() : pos < _servo[0]->min() ? _servo[0]->min() : pos;
     for (auto s : _servo)
     {
-        s->setAngleBySpeed(pos + _offset, speed);
+        s->setAngleBySpeed(pos, speed);
     }
+    return pos - _offset;
 }

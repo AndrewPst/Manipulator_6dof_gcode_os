@@ -16,6 +16,7 @@ void Core::initJoints(ExecutionContext &context)
     {
         j->initialize();
     }
+    context.enivroment().manipulator.effector->initializate();
 }
 
 void Core::setWaitFunc(WaitFunction w)
@@ -43,10 +44,10 @@ void Core::execute(Command_t &command, BehaviourFlag_t flag, ExecutionContext &c
     std::unique_ptr<IExecutableCommand> executer(((*ex_pointer).second)());
     ::ExecuteState_t _exState{::ExecuteState_t::STATE_IN_PROCESS};
     TimerT timer;
+    _exState = executer->started(context.enivroment(), command);
     timer.reset();
     timer.start();
-    executer->started(context.enivroment(), command);
-    while (_exState != ::ExecuteState_t::STATE_FINISHED)
+    while (_exState == ::ExecuteState_t::STATE_IN_PROCESS)
     {
         if (context.state() == core::ExecuteState_t::STATE_RUNNING)
         {
@@ -58,6 +59,8 @@ void Core::execute(Command_t &command, BehaviourFlag_t flag, ExecutionContext &c
             }
             else if (_exState == ::ExecuteState_t::STATE_ERROR)
             {
+                for(auto &s : context.enivroment().manipulator.joints)
+                    s.get()->stop();
                 DEBUG_ERR("[%s]-execution error: %d\n", command.Key, _exState)
                 if (flag & BehaviourFlags::DEHAVIOUR_FINISH_PROGRAN_IF_EXECUTION_ERROR)
                     context.setState(core::ExecuteState_t::STATE_FINISHED);
@@ -74,4 +77,8 @@ void Core::execute(Command_t &command, BehaviourFlag_t flag, ExecutionContext &c
         _waitFunc(2);
     }
     executer->ended();
+    timer.stop();
+#if __PRINT_PARSED_INPUT == 1
+    DEBUG_VERBOSE("Command executed");
+#endif
 }

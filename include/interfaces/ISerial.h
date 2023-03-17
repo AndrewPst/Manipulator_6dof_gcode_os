@@ -19,5 +19,7 @@ public:
     virtual ISerial &operator>>(char *str) = 0;
     virtual size_t readUntil(char *buffer, size_t size, char symbol) = 0;
 
+    virtual size_t seek(size_t, int) {return 0;};
+
     virtual ~ISerial() = default;
 };

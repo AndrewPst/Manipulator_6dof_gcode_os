@@ -46,7 +46,7 @@ ExecuteState_t m32::started(core::ExecutionEnivroment &m, Command_t &args)
     }
     auto p = args.args.begin();
     const char *name = *p;
-    DEBUG_VERBOSE("File name: %s", name);
+    DEBUG_INFO("File name: %s", name);
     if (setFile(name) != ExecuteState_t::STATE_IN_PROCESS)
     {
         return ExecuteState_t::STATE_ERROR;
@@ -79,10 +79,10 @@ ExecuteState_t m21::started(core::ExecutionEnivroment &m, Command_t &args)
     init_sd_result += sdCard.mount();
     if (init_sd_result == 0)
     {
-        DEBUG_VERBOSE("Sd mount done");
+        DEBUG_INFO("Sd mount done");
         return ExecuteState_t::STATE_IN_PROCESS;
     }
-    DEBUG_VERBOSE("Sd mount err");
+    DEBUG_INFO("Sd mount err");
     return ExecuteState_t::STATE_ERROR;
 }
 
@@ -104,10 +104,10 @@ ExecuteState_t m22::started(core::ExecutionEnivroment &m, Command_t &args)
     deinit_sd_result += sdCard.deinit();
     if (deinit_sd_result == 0)
     {
-        DEBUG_VERBOSE("Sd unmount done");
+        DEBUG_INFO("Sd unmount done");
         return ExecuteState_t::STATE_IN_PROCESS;
     }
-    DEBUG_VERBOSE("Sd unmount err");
+    DEBUG_INFO("Sd unmount err");
     return ExecuteState_t::STATE_ERROR;
 }
 

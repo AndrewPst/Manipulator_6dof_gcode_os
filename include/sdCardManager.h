@@ -28,6 +28,8 @@ public:
 
     int32_t mount() override;
     int32_t unmount() override;
+
+    int32_t format() override;
     
     size_t size() override;
     FILE *openFile(const char *, const char *) override;

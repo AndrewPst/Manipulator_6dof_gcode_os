@@ -32,10 +32,13 @@ public:
 
     virtual void enable() = 0;
     virtual void disable() = 0;
+    virtual void stop() = 0;
 
     virtual void setPause(bool) = 0;
 
-    virtual void move(double, double) = 0;
+    virtual bool posAchievable(double) = 0;
+
+    virtual double move(double, double) = 0; //return real max position
     virtual double position() const = 0;
     virtual JointState_t state() = 0;
 

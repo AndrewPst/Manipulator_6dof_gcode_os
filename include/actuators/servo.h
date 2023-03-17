@@ -53,11 +53,11 @@ public:
     void setPause(bool);
 
     void wait();
-    void tick() override;
+    void tick(TimeDiff_ms_t) override;
 
     void disable();
     void enable();
-
+    void stop();
 
 protected:
     PwmOut _pwm;
@@ -74,7 +74,10 @@ protected:
     bool _isInverse{false};
     bool _isPause{false};
 
-    Timer timer;
+    const uint32_t _driveStoke{180};
+
+    //Timer timer;
+    //TimeDiff_ms_t _move_elapsed_time{0};
 
 #ifdef _USE_MUTEX
     mutable Mutex _mutex;

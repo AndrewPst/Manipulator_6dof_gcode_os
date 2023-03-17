@@ -152,6 +152,11 @@ public:
         return i;
     }
 
+    size_t seek(size_t off, int whence) override
+    {
+        return _serial->seek(off, whence);
+    }
+
     void read()
     {
         MutexLocker<Mutex> m(_mutex);

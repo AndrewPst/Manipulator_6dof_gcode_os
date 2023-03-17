@@ -6,6 +6,10 @@
 #include "core/core.h"
 #include "core/coreTaskManager.h"
 
+#include "models/dhTable.h"
+#include "models/angleConverter.h"
+#include "kinematics/kinematics.h"
+
 #include "actuatorsLive.h"
 #include "strParser.h"
 #include "serial/uartSerial.h"
@@ -13,6 +17,7 @@
 #include "gcodeLexer.h"
 #include "sdCardManager.h"
 #include "serial/fileSerial.h"
+#include "periphery/buttons.h"
 
 namespace debug_mess
 {
@@ -23,13 +28,26 @@ namespace debug_mess
   constexpr static const char *SD_MOUNT_RESULT = "Sd card mount result: %i";
   constexpr static const char *READ_CONFIG_FILE = "Reading config file [%s]";
   constexpr static const char *READ_CONFIG_DONE = "Reading config file done";
+  constexpr static const char *KINEMATICS_CALC_ERROR = "Kinematics calculation err";
 #endif
 };
 
-ActuatorsLive alive;
-Thread athread;
+ActuatorsLive<ThreadRegistrator> alive;
+ThreadT athread;
 
-core::ExecutionEnivroment env;
+core::ExecutionEnivroment env{
+    .manipulator = Manipulator{
+        .dhTable = {
+            .theta = {0, degToRad(-90), 0, 0, 0, 0},
+            .alfa = {degToRad(-90), 0, degToRad(-90), degToRad(90), degToRad(-90), 0},
+            .d = {83.5, 0, 0, 105, 0, 100},
+            .r = {0, 133, 10, 0, 0, 0},
+        },
+    },
+};
+
+ButtonsDriver _butDriver(env.manipulator);
+ThreadT _butThread;
 
 int main()
 {
@@ -47,6 +65,12 @@ int main()
   init_sd_result = sdCard.mount();
   DEBUG_INFO(debug_mess::SD_MOUNT_RESULT, init_sd_result);
 
+  if (init_sd_result != 0)
+  {
+    init_sd_result = sdCard.format();
+    DEBUG_INFO("Reformat result: %i", init_sd_result);
+  }
+
 #endif
 
   core::core.initializate();
@@ -60,13 +84,36 @@ int main()
   context_file.setEnivroment(env);
 #endif
 
+  core::ExecutionContext &context_buttons = core::coreTaskManager.getContext(core::CoreTaskKey::TASK_INPUT_BUTTONS);
+  context_buttons.setEnivroment(env);
+
+  _butDriver.initialize<ThreadRegistrator, ThreadT>(_butThread);
+
   DEBUG_INFO(debug_mess::READ_CONFIG_FILE, CONFIG_FILE_PATH);
-  core::core.readConfigFile<ActuatorsLive>(alive, context);
+  core::core.readConfigFile<ActuatorsLive<ThreadRegistrator>>(alive, context);
   alive.startThread<ThreadT>(athread);
   DEBUG_INFO(debug_mess::READ_CONFIG_DONE);
 
   core::core.initJoints(context);
 
+  kinematics::kinematics6dof.setDHTable(env.manipulator.dhTable);
+  std::vector<double> angles(DOF);
+  for (uint8_t i = 0; i < DOF; i++)
+    angles[i] = degToRad(env.manipulator.joints[i].get()->position());
+  auto result = kinematics::kinematics6dof.forward(angles, env.manipulator.effectorPos);
+  if (result == kinematics::CalculationResult_t::CALC_ERROR)
+    DEBUG_ERR(debug_mess::KINEMATICS_CALC_ERROR);
+
+#if __DEBUG_LEVEL >= __DEBUG_LEVEL_VERBOSE
+  debug_out << "Position: ";
+  debug_out << env.manipulator.effectorPos.x << '\t'
+            << env.manipulator.effectorPos.y << '\t'
+            << env.manipulator.effectorPos.z << '\t'
+            << env.manipulator.effectorPos.a << '\t'
+            << env.manipulator.effectorPos.b << '\t'
+            << env.manipulator.effectorPos.g;
+  debug_out << '\n';
+#endif
   context.setInput(debug_out);
   context.setOutput(debug_out);
 

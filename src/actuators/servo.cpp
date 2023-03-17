@@ -13,7 +13,7 @@
 #define MUTEX_UNLOCK
 #endif
 
-#define constrain(a, b, c) (((a) < (b)) ? (b) : (a) > (c) ? (c) \
+#define constrain(a, b, c) (((a) < (b)) ? (b) : ((a) > (c)) ? (c) \
                                                           : (a))
 #define sign(x) ((x) >= 0 ? 1 : -1)
 
@@ -37,7 +37,7 @@ void ServoDriver::setValue(double angle)
     MUTEX_LOCK
     angle = constrain(angle, _min, _max);
     _angle = angle;
-    int16_t i1 = (uint32_t)(angle - _min) / ((uint32_t)(_max - _min) / (_table.resolution - 1));
+    int16_t i1 = (uint32_t)(angle - _min) / (_driveStoke / (_table.resolution - 1));
     uint32_t ticks = 0;
     int16_t i2 = (i1 + 1) >= _table.resolution ? i1 : i1 + 1;
     if (i1 == i2)
@@ -46,8 +46,8 @@ void ServoDriver::setValue(double angle)
     }
     else
     {
-        double x1 = (_max - _min) / (_table.resolution - 1) * i1;
-        double x2 = (_max - _min) / (_table.resolution - 1) * i2;
+        double x1 = (_driveStoke) / (_table.resolution - 1) * i1;
+        double x2 = (_driveStoke) / (_table.resolution - 1) * i2;
         ticks = _table._pulseTable[i1] + (_table._pulseTable[i2] - _table._pulseTable[i1]) * (angle - x1) / (x2 - x1);
     }
     if (_isInverse)
@@ -116,40 +116,40 @@ bool ServoDriver::isInverse() const
     return _isInverse;
 }
 
-void ServoDriver::tick()
+void ServoDriver::tick(TimeDiff_ms_t timediff)
 {
-    MUTEX
+    MUTEX_LOCK
     if (_isActiveAction == false || _isPause == true)
-        return;
-    double timediff = std::chrono::duration_cast<std::chrono::milliseconds>(timer.elapsed_time()).count();
-    double step = _speed * timediff / 1000.0;
-    if (sign(_target - (_angle + step * _dir)) != _dir || (_angle + step * _dir) > _max || (_angle + step * _dir) < _min)
     {
         MUTEX_UNLOCK
-        setValue(_target);
-        MUTEX_LOCK
-        timer.stop();
+        return;
+    }
+    //double timediff = std::chrono::duration_cast<std::chrono::milliseconds>(timer.elapsed_time()).count();
+    double step = _speed * (double)timediff / 1000.0;
+    double angle{0};
+    if (sign(_target - (_angle + step * _dir)) != _dir || (_angle + step * _dir) > _max || (_angle + step * _dir) < _min)
+    {
         _isActiveAction = false;
+        angle = _target;
     }
     else
     {
-        MUTEX_UNLOCK
-        setValue(_angle + step * _dir);
-        MUTEX_LOCK
-        timer.reset();
+        angle = _angle + step * _dir;
     }
+    MUTEX_UNLOCK
+    setValue(angle);
 }
 
 void ServoDriver::setPause(bool pause)
 {
     MUTEX
-    if (_isPause == pause)
-        return;
+    // if (_isPause == pause)
+    //     return;
     _isPause = pause;
-    if (_isPause)
-        timer.stop();
-    else
-        timer.start();
+    // if (_isPause)
+    //     timer.stop();
+    // else
+    //     timer.start();
 }
 
 void ServoDriver::setAngleBySpeed(double pos, double speed)
@@ -162,26 +162,32 @@ void ServoDriver::setAngleBySpeed(double pos, double speed)
     _target = pos;
     _dir = sign(_target - _angle);
 
-    timer.reset();
-    timer.start();
+    //_move_elapsed_time = 0;
+    // timer.reset();
+    // timer.start();
 }
 
 void ServoDriver::wait()
 {
-    while (isRotation())
-    {
-        tick();
-        thread_sleep_for(AUTO_WAIT_RESOLUTION);
-    }
+    // while (isRotation())
+    // {
+    //     tick();
+    //     thread_sleep_for(AUTO_WAIT_RESOLUTION);
+    // }
+}
+
+void ServoDriver::stop()
+{
+    MUTEX_LOCK
+    _isActiveAction = false;
+    // timer.stop();
+    _target = _angle;
+    MUTEX_UNLOCK
 }
 
 void ServoDriver::disable()
 {
-    MUTEX_LOCK
-    _isActiveAction = false;
-    timer.stop();
-    _target = _angle;
-    MUTEX_UNLOCK
+    stop();
     setMicroseconds(0);
 }
 
