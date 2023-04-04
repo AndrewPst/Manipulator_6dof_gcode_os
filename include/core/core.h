@@ -67,15 +67,18 @@ namespace core
             std::make_pair(::executableCommands::g5::key(), ::executableCommands::g5::generate),
             std::make_pair(::executableCommands::g4::key(), ::executableCommands::g4::generate),
             std::make_pair(::executableCommands::g6::key(), ::executableCommands::g6::generate),
-            std::make_pair(::executableCommands::m32::key(), ::executableCommands::m32::generate),
-            std::make_pair(::executableCommands::m21::key(), ::executableCommands::m21::generate),
-            std::make_pair(::executableCommands::m22::key(), ::executableCommands::m22::generate),
+
             std::make_pair(::executableCommands::m17::key(), ::executableCommands::m17::generate),
             std::make_pair(::executableCommands::m18::key(), ::executableCommands::m18::generate),
-            std::make_pair(::executableCommands::m112::key(), ::executableCommands::m112::generate),
-            std::make_pair(::executableCommands::m25::key(), ::executableCommands::m25::generate),
-            std::make_pair(::executableCommands::m24::key(), ::executableCommands::m24::generate),
+            std::make_pair(::executableCommands::m20::key(), ::executableCommands::m20::generate),
+            std::make_pair(::executableCommands::m21::key(), ::executableCommands::m21::generate),
+            std::make_pair(::executableCommands::m22::key(), ::executableCommands::m22::generate),
             std::make_pair(::executableCommands::m23::key(), ::executableCommands::m23::generate),
+            std::make_pair(::executableCommands::m24::key(), ::executableCommands::m24::generate),
+            std::make_pair(::executableCommands::m25::key(), ::executableCommands::m25::generate),
+            std::make_pair(::executableCommands::m32::key(), ::executableCommands::m32::generate),
+            
+            std::make_pair(::executableCommands::m112::key(), ::executableCommands::m112::generate),
         };
 
     public:

@@ -8,7 +8,7 @@ void ServoJoint::initialize()
 {
     for (auto s : _servo)
     {
-        s->setValue(0 + _offset);
+        s->initializate(0 + _offset);
     }
 }
 
@@ -17,7 +17,6 @@ void ServoJoint::enable()
     for (auto s : _servo)
     {
         s->enable();
-        thread_sleep_for(10);
     }
 }
 

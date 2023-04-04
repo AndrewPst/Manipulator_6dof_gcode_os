@@ -5,6 +5,7 @@
 #include "models/Command_t.h"
 #include "interfaces/IExecutableCommand.h"
 #include "core/executeState.h"
+#include <bitset>
 
 namespace executableCommands
 {
@@ -25,6 +26,25 @@ namespace executableCommands
         constexpr static const char *key()
         {
             return "M32";
+        }
+    };
+
+    // files list
+    struct m20 : public IExecutableCommand
+    {
+    public:
+        ::ExecuteState_t started(core::ExecutionEnivroment &m, Command_t &args) override;
+        ::ExecuteState_t execute(core::ExecutionEnivroment &, TimeDif_ms_t time) override;
+        void ended() override;
+
+        static IExecutableCommand *generate()
+        {
+            return new m20();
+        }
+
+        constexpr static const char *key()
+        {
+            return "M20";
         }
     };
 
@@ -69,6 +89,11 @@ namespace executableCommands
     // Enable actuators
     struct m17 : public IExecutableCommand
     {
+    private:
+        TimeDif_ms_t _pause{0};
+        TimeDif_ms_t _last{0};
+        std::bitset<DOF + 1> _act;
+        uint8_t _pos{0};
     public:
         ::ExecuteState_t started(core::ExecutionEnivroment &m, Command_t &args) override;
         ::ExecuteState_t execute(core::ExecutionEnivroment &, TimeDif_ms_t time) override;

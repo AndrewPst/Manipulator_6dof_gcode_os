@@ -1,5 +1,6 @@
 #include "commandExecutors/g_group.h"
 
+#include "config.h"
 #include "global.h"
 #include "out.h"
 #include "sdCardManager.h"
@@ -8,6 +9,15 @@
 #include "core/core.h"
 
 using namespace executableCommands;
+
+constexpr static const char TIME_KEY = 'T';
+constexpr static const char JOINT_0_KEY = 'A';
+constexpr static const char JOINT_1_KEY = 'B';
+constexpr static const char JOINT_2_KEY = 'C';
+constexpr static const char JOINT_3_KEY = 'D';
+constexpr static const char JOINT_4_KEY = 'E';
+constexpr static const char JOINT_5_KEY = 'F';
+constexpr static const char EFFECTOR_KEY = 'P';
 
 namespace debug_mess
 {
@@ -68,6 +78,28 @@ void m32::ended() {}
 
 #pragma endregion
 
+#pragma region m20
+
+ExecuteState_t m20::started(core::ExecutionEnivroment &m, Command_t &args)
+{
+#if __USE_SDCARD == 1
+    sdCard.printFiles<ISerial>("/sd/", core::coreTaskManager.getContext(core::CoreTaskKey::TASK_INPUT_UART).output());
+    return ExecuteState_t::STATE_FINISHED;
+#else
+
+    return ExecuteState_t::STATE_ERROR;
+#endif
+}
+
+ExecuteState_t m20::execute(core::ExecutionEnivroment &, TimeDif_ms_t time)
+{
+    return ExecuteState_t::STATE_FINISHED;
+}
+
+void m20::ended() {}
+
+#pragma endregion
+
 #pragma region m21
 
 ExecuteState_t m21::started(core::ExecutionEnivroment &m, Command_t &args)
@@ -124,15 +156,54 @@ void m22::ended() {}
 
 ExecuteState_t m17::started(core::ExecutionEnivroment &m, Command_t &args)
 {
+    // auto newTime = std::find_if(args.args.begin(), args.args.end(), [](const char *a)
+    //                             { return a[0] == TIME_KEY; });
+    // if (newTime != args.args.end())
+    //     _pause = atoi(*newTime + 1);
+    // bool _isAllActEnable{true};
+    // for (auto i = args.args.begin(); i != args.args.end(); i++)
+    // {
+    //     if (*i[0] == TIME_KEY)
+    //         continue;
+    //     _isAllActEnable = false;
+    //     if (*i[0] == EFFECTOR_KEY)
+    //         _act[DOF] = 1;
+    //     uint8_t index = *i[0] - JOINT_0_KEY;
+    //     if (index >= DOF)
+    //         return ExecuteState_t::STATE_ERROR;
+    //     _act[index] = 1;
+    // }
+    // if (_isAllActEnable)
+    // {
+    //     _act = std::bitset<DOF+1>().set();
+    // }
+    // return ExecuteState_t::STATE_IN_PROCESS;
     for (auto &j : m.manipulator.joints)
     {
         j->enable();
     }
+    m.manipulator.effector->enable();
     return ExecuteState_t::STATE_IN_PROCESS;
 }
 
-ExecuteState_t m17::execute(core::ExecutionEnivroment &, TimeDif_ms_t time)
+ExecuteState_t m17::execute(core::ExecutionEnivroment &env, TimeDif_ms_t time)
 {
+    // if (time - _last < _pause)
+    //     return ExecuteState_t::STATE_IN_PROCESS;
+    // while (_act[_pos] == 0)
+    // {
+    //     ++_pos;
+    //     if (_pos > DOF)
+    //         break;
+    // }
+    // if (_pos < DOF)
+    //     env.manipulator.joints[_pos]->enable();
+    // else if (_pos == DOF)
+    //     env.manipulator.effector->enable();
+    // else
+    //     return ExecuteState_t::STATE_FINISHED;
+    // _last = time;
+    // return ExecuteState_t::STATE_IN_PROCESS;
     return ExecuteState_t::STATE_FINISHED;
 }
 
@@ -148,6 +219,7 @@ ExecuteState_t m18::started(core::ExecutionEnivroment &m, Command_t &args)
     {
         j->disable();
     }
+    m.manipulator.effector->disable();
     return ExecuteState_t::STATE_IN_PROCESS;
 }
 

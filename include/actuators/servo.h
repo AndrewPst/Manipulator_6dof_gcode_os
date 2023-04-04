@@ -29,6 +29,8 @@ public:
     ServoDriver(PinName pin, const PulseTable_t & = default_table);
     ServoDriver(PinName pin, double min, double max, const PulseTable_t & = default_table);
 
+    void initializate(double angle);
+
     void setTable(const PulseTable_t &);
     const PulseTable_t &table() const;
 

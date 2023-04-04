@@ -26,6 +26,13 @@ ServoDriver::ServoDriver(PinName pin, double min, double max, const PulseTable_t
 {
 }
 
+void ServoDriver::initializate(double angle)
+{
+    MUTEX
+    _angle = constrain(angle, _min, _max);
+}
+
+
 void ServoDriver::setMicroseconds(int32_t value)
 {
     MUTEX

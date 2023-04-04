@@ -37,4 +37,18 @@ public:
     DIR *openDir(const char *) override;
     int32_t closeDir(DIR *) override;
 
+    template<typename _outT>
+    size_t printFiles(const char* dir, _outT& out)
+    {
+        DIR* dir_ = opendir(dir);
+        dirent *de;
+        size_t count{0};
+        while((de = readdir(dir_)) != NULL)
+        {
+            out << &(de->d_name)[0] << '\n';
+            ++count;
+        }
+        closedir(dir_);
+        return count;
+    }
 };
